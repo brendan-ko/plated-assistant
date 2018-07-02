@@ -43,8 +43,6 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
   console.log('Dialogflow Request body: ' + JSON.stringify(request.body));
 
   function welcome(agent) {
-    console.log(request);
-    console.log(request.body);
     console.log(request.body.originalDetectIntentRequest.payload.user);
     const token = request.body.originalDetectIntentRequest.payload.user.accessToken;
     const config = {
@@ -56,13 +54,17 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 
     return axios.get('https://pltd-staging.com/api/v2/boxes/future.json', config)
       .then(boxRes => {
-        const boxes = boxRes.data;
+        const boxes = boxRes.data.boxes;
         return axios.get('https://pltd-staging.com/api/v2/me.json', config)
           .then(userRes => {
-            const user = userRes.data;
-            console.log(boxes);
-            console.log(user);
-            agent.add("REQUEST FINISHED IN CLI");
+            const user = userRes.data.user;
+            // console.log(boxes);
+            // console.log(user);
+            const userContext = { 'name': 'user', 'lifespan': 5, 'parameters': { 'user': user} };
+            const boxesContext = { 'name': 'boxes', 'lifespan': 5, 'parameters': { 'boxes': boxes} };
+            agent.setContext(userContext);
+            agent.setContext(boxesContext);
+            agent.add(`Hi ${user.first_name}. What would you like help with today?`);
           })
           .catch(error => {
             console.log("user error");
@@ -73,28 +75,20 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
         console.log("box error");
         console.log(error);
       })
-
-    //  return axios.get('https://pltd-staging.com/api/v2/boxes/future.json', config)
-    //     .then(res => {
-    //       console.log(res.data);
-    //       agent.add("WORKED");
-    //     })
-    //     .catch(error => {
-    //       console.log(error);
-    //     })
   }
 
+  function contextTest(agent) {
+    console.log(agent.contexts);
+    const user = agent.getContext('user');
+    const boxes = agent.getContext('boxes');
+    console.log(user);
+    console.log(boxes);
+    agent.add("Context Tester");
+  }
 
-  //   function fallback(agent) {
-  //     agent.add(`I didn't understand`);
-  //     agent.add(`I'm sorry, can you try again?`);
-  //   }
-
-  // Uncomment and edit to make your own intent handler
-  // uncomment `intentMap.set('your intent name here', yourFunctionHandler);`
-  // below to get this function to be run when a Dialogflow intent is matched
-
-
+  function fallback(agent) {
+    agent.add(`Sorry, there was a problem :(`);
+  }
 
   function recipeShow(agent) {
     return axios.get('https://api.plated.com/api/v4/menus.json')
@@ -231,10 +225,11 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
   // Run the proper function handler based on the matched Dialogflow intent name
   let intentMap = new Map();
   intentMap.set('Default Welcome Intent', welcome);
-  //   intentMap.set('Default Fallback Intent', fallback);
+  intentMap.set('Default Fallback Intent', fallback);
   intentMap.set('TestIntent', yourFunctionHandler);
   intentMap.set('RecipeConfirmation', recipeShowTest);
   intentMap.set('RecipeNavigation', recipeNav);
+  intentMap.set('ContextTester', contextTest)
   // intentMap.set('your intent name here', yourFunctionHandler);
   // intentMap.set('your intent name here', googleAssistantHandler);
   agent.handleRequest(intentMap);
