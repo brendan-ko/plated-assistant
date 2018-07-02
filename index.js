@@ -9,19 +9,6 @@ const { Card, Suggestion } = require('dialogflow-fulfillment');
 
 //axios
 const axios = require('axios');
-const getRecipes = () => {
-  const recipes = [];
-  axios.get('https://api.plated.com/api/v4/menus.json')
-    .then(res => {
-      return {
-        mains: res.data.mains,
-        desserts: res.data.desserts,
-      }
-    })
-    .catch(error => {
-      console.log(error);
-    })
-}
 
 //html tag strip via regex
 
@@ -65,15 +52,18 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
             agent.setContext(userContext);
             agent.setContext(boxesContext);
             agent.add(`Hi ${user.first_name}. What would you like help with today?`);
+            return true;
           })
           .catch(error => {
             console.log("user error");
             console.log(error);
+            return true;
           })
       })
       .catch(error => {
         console.log("box error");
         console.log(error);
+        return true;
       })
   }
 
@@ -91,24 +81,6 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
   }
 
   function recipeShow(agent) {
-    return axios.get('https://api.plated.com/api/v4/menus.json')
-      .then(res => {
-        const { mains, desserts } = res.data;
-        const firstMain = mains[0];
-        const { name, equipment, description, ingredients, images } = firstMain;
-        agent.add(new Card({
-          title: name,
-          imageUrl: `http://${images[4].image.url.slice(2)}`,
-          text: description,
-        }));
-      })
-      .catch(error => {
-        console.log(error);
-      })
-
-  }
-
-  function recipeShowTest(agent) {
     //   return axios.get('https://pltd-staging.com/api/v2/boxes/future.json')
     console.log(request.body.originalDetectIntentRequest.payload.user);
     return axios.get('https://api.plated.com/api/v4/menus.json')
@@ -227,7 +199,7 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
   intentMap.set('Default Welcome Intent', welcome);
   intentMap.set('Default Fallback Intent', fallback);
   intentMap.set('TestIntent', yourFunctionHandler);
-  intentMap.set('RecipeConfirmation', recipeShowTest);
+  intentMap.set('RecipeConfirmation', recipeShow);
   intentMap.set('RecipeNavigation', recipeNav);
   intentMap.set('ContextTester', contextTest)
   // intentMap.set('your intent name here', yourFunctionHandler);
