@@ -37,38 +37,14 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
     };
 
 
-    //  chain promise to setContext for both api requests
+    const getAxios = require('./getAxios');
+    console.log(getAxios);
 
-    // axios.all([getUserAccount(), getUserPermissions()])
-    //   .then(axios.spread(function (acct, perms) {
-    //     // Both requests are now complete
-    //   }));
+    const boxes = getAxios.getBoxes(config);
+    const user = getAxios.getUser(config);
 
-    const boxes = axios.get('https://pltd-staging.com/api/v2/boxes/future.json', config)
-      .then(boxRes => {
-        return boxRes.data.boxes;
-      })
-      .catch(error => {
-        console.log("box error");
-        console.log(error);
-        return true;
-      })
-
-    const user = axios.get('https://pltd-staging.com/api/v2/me.json', config)
-      .then(userRes => {
-        return userRes.data.user;
-      })
-      .catch(error => {
-        console.log("user error");
-        console.log(error);
-        return true;
-      })
     return Promise.all([boxes, user])
       .then(([boxesRes, userRes]) => {
-        console.log(boxes);
-        console.log(user);
-        console.log(boxesRes);
-        console.log(userRes);
         const userContext = {
           'name': 'user',
           'lifespan': 5,
@@ -82,39 +58,12 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
         agent.setContext(userContext);
         agent.setContext(boxesContext);
         agent.add(`Hi ${userRes.first_name}. What would you like help with today?`);
+        console.log("REQ FINISHED");
         return true;
       })
       .catch(error => {
         console.log(error);
       })
-    
-
-    // return axios.get('https://pltd-staging.com/api/v2/boxes/future.json', config)
-    //   .then(boxRes => {
-    //     const boxes = boxRes.data.boxes;
-    //     return axios.get('https://pltd-staging.com/api/v2/me.json', config)
-    //       .then(userRes => {
-    //         const user = userRes.data.user;
-    //         // console.log(boxes);
-    //         // console.log(user);
-    //         const userContext = { 'name': 'user', 'lifespan': 5, 'parameters': { 'user': user} };
-    //         const boxesContext = { 'name': 'boxes', 'lifespan': 5, 'parameters': { 'boxes': boxes} };
-    //         agent.setContext(userContext);
-    //         agent.setContext(boxesContext);
-    //         agent.add(`Hi ${user.first_name}. What would you like help with today?`);
-    //         return true;
-    //       })
-    //       .catch(error => {
-    //         console.log("user error");
-    //         console.log(error);
-    //         return true;
-    //       })
-    //   })
-    //   .catch(error => {
-    //     console.log("box error");
-    //     console.log(error);
-    //     return true;
-    //   })
   }
 
   function contextTest(agent) {
@@ -143,6 +92,7 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
         agent.setContext(context);
         const stepTotal = steps.length;
         agent.add(`OK, let's start! There are ${stepTotal} steps. To begin, say "Start at step 1."`)
+        return;
       })
       .catch(error => {
         console.log(error);
