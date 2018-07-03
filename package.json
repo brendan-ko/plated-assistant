@@ -3,10 +3,10 @@
   "description": "Cloud Functions for Firebase",
   "scripts": {
     "lint": "eslint .",
-    "serve": "firebase serve --only dialogflowFirebaseFulfillment",
+    "serve": "firebase serve --only functions:dialogflowFirebaseFulfillment",
     "shell": "firebase functions:shell",
     "start": "npm run shell",
-    "deploy": "firebase deploy --only dialogflowFirebaseFulfillment",
+    "deploy": "firebase deploy --only functions:dialogflowFirebaseFulfillment",
     "logs": "firebase functions:log"
   },
   "dependencies": {
