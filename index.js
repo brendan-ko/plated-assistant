@@ -74,9 +74,29 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
     agent.add(`Sorry, there was a problem :(`);
   }
 
+  function recipeSearch(agent) {
+    console.log(agent);
+    agent.add("recipe search");
+  }
+
   function recipeShow(agent) {
-    console.log(request.body);
-    agent.add("recipeShow");
+    console.log(request.body.originalDetectIntentRequest.payload.user);
+    return axios.get('https://api.plated.com/api/v4/menus.json')
+      .then(res => {
+        console.log(res.data);
+        const { mains, desserts } = res.data;
+        const firstMain = mains[0];
+        const { name, equipment, description, ingredients, images, steps } = firstMain;
+        const context = { 'name': 'recipe', 'lifespan': 5, 'parameters': { 'recipe': firstMain, 'step': 1 } };
+        agent.setContext(context);
+        const stepTotal = steps.length;
+        agent.add(`OK, let's start! There are ${stepTotal} steps. To begin, say "Start at step 1."`)
+        return;
+      })
+      .catch(error => {
+        console.log(error);
+      })
+
   }
 
   function recipeNav(agent) {
@@ -178,6 +198,7 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
   intentMap.set('Default Welcome Intent', welcome);
   intentMap.set('Default Fallback Intent', fallback);
   intentMap.set('TestIntent', yourFunctionHandler);
+  intentMap.set('RecipeSearch', recipeSearch);
   intentMap.set('RecipeConfirmation', recipeShow);
   intentMap.set('RecipeNavigation', recipeNav);
   intentMap.set('ContextTester', contextTest)
