@@ -18,10 +18,6 @@ function htmlStrip(str) {
 
 //handleNav function
 
-function handleNav(agent, navStr) {
-
-}
-
 process.env.DEBUG = 'dialogflow:debug'; // enables lib debugging statements
 
 exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, response) => {
@@ -38,7 +34,6 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 
 
     const getAxios = require('./getAxios');
-    console.log(getAxios);
 
     const boxes = getAxios.getBoxes(config);
     const user = getAxios.getUser(config);
@@ -80,24 +75,8 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
   }
 
   function recipeShow(agent) {
-    //   return axios.get('https://pltd-staging.com/api/v2/boxes/future.json')
-    console.log(request.body.originalDetectIntentRequest.payload.user);
-    return axios.get('https://api.plated.com/api/v4/menus.json')
-      .then(res => {
-        console.log(res.data);
-        const { mains, desserts } = res.data;
-        const firstMain = mains[0];
-        const { name, equipment, description, ingredients, images, steps } = firstMain;
-        const context = { 'name': 'recipe', 'lifespan': 5, 'parameters': { 'recipe': firstMain, 'step': 1 } };
-        agent.setContext(context);
-        const stepTotal = steps.length;
-        agent.add(`OK, let's start! There are ${stepTotal} steps. To begin, say "Start at step 1."`)
-        return;
-      })
-      .catch(error => {
-        console.log(error);
-      })
-
+    console.log(request.body);
+    agent.add("recipeShow");
   }
 
   function recipeNav(agent) {
