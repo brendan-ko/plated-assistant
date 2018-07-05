@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 function getBoxes(configHeader) {
-  return axios.get('https://pltd-staging.com/api/v2/boxes/future.json', configHeader)
+  return axios.get('https://pltd-staging.com/api/v2/boxes.json', configHeader)
   .then(boxRes => {
     return boxRes.data.boxes;
   })
