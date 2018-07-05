@@ -8,7 +8,7 @@
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions:dialogflowFirebaseFulfillment",
     "logs": "firebase functions:log",
-    "test": "mocha"
+    "test": "mocha || true"
   },
   "dependencies": {
     "actions-on-google": "2.0.0-alpha.4",

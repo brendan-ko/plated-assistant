@@ -40,6 +40,8 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 
     return Promise.all([boxes, user])
       .then(([boxesRes, userRes]) => {
+        console.log(userRes);
+        console.log(boxesRes);
         const userContext = {
           'name': 'user',
           'lifespan': 5,
