@@ -1,7 +1,7 @@
 const assert = require('chai').assert;
 const mocha = require('../mocha');
 
-describe('Mocha', function() {
+describe.skip('Mocha', function() {
   describe('hello', function() {
     it('should return hello', function () {
       assert.equal(mocha.hello(), 'hello');
