@@ -1,3 +1,5 @@
+const recipeErrorMessage = 'Sorry, I couldn\'t find any recipes with that name.';
+
 function recipeStringCount(ingredients, recipeStr) {
   let strCount = 0;
   ingredients.forEach( (ingredient) => {
@@ -6,11 +8,26 @@ function recipeStringCount(ingredients, recipeStr) {
   return strCount;
 }
 
-function recipeFind(ingredients, recipeStrArr) {
-
+function recipeFindBestMatch(ingredients, recipeStrArr) {
+  if(ingredients.length === 0 || recipeStrArr.length === 0) {
+    return recipeErrorMessage;
+  }
+  else {
+    let highestMatchCount = 0;
+    let highestMatchStr = recipeErrorMessage;
+    recipeStrArr.forEach( (recipeStr) => {
+      const strCount = recipeStringCount(ingredients, recipeStr);
+      if (strCount > highestMatchCount) {
+        highestMatchCount = strCount;
+        highestMatchStr = recipeStr;
+      }
+    })
+    return highestMatchStr;
+  }
 }
 
 module.exports = {
   'recipeStringCount': recipeStringCount,
-  'recipeFind': recipeFind,
+  'recipeFindBestMatch': recipeFindBestMatch,
+  'recipeErrorMessage': recipeErrorMessage,
 }
