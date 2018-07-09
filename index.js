@@ -25,6 +25,11 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
   console.log('Dialogflow Request headers: ' + JSON.stringify(request.headers));
   console.log('Dialogflow Request body: ' + JSON.stringify(request.body));
 
+  //util function importing
+  const context = require('./context');
+  const getAxios = require('./getAxios');
+  const {createContext} = context;
+
   function welcome(agent) {
     console.log(request.body.originalDetectIntentRequest.payload.user);
     const token = request.body.originalDetectIntentRequest.payload.user.accessToken;
@@ -32,9 +37,7 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
       headers: { 'Authorization': "bearer " + token }
     };
 
-
-    const getAxios = require('./getAxios'); 
-
+    // const getAxios = require('./getAxios'); 
     const boxes = getAxios.getBoxes(config);
     const user = getAxios.getUser(config);
 
@@ -42,22 +45,9 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
       .then(([boxesRes, userRes]) => {
         console.log(userRes);
         console.log(boxesRes);
-        const userContext = {
-          'name': 'user',
-          'lifespan': 5,
-          'parameters': { 'user': userRes } 
-        };
-        const boxesContext = {
-          'name': 'boxes',
-          'lifespan': 5,
-          'parameters': { 'boxes': boxesRes.boxes }
-        };
-        const recipesContext = {
-          'name': 'recipes',
-          'lifespan': 5,
-          'parameters': { 'recipes': boxesRes.recipes }
-        };
-        console.log(boxesRes);
+        const userContext = createContext('user', 20, userRes);
+        const boxesContext = createContext('boxes', 20, boxesRes.boxes);
+        const recipesContext = createContext('recipes', 20, boxesRes.recipes);
         agent.setContext(userContext);
         agent.setContext(boxesContext);
         agent.setContext(recipesContext);
@@ -73,8 +63,10 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
     console.log(agent.contexts);
     const user = agent.getContext('user');
     const boxes = agent.getContext('boxes');
+    const recipes = agent.getContext('recipes');
     console.log(user);
     console.log(boxes);
+    console.log(recipes);
     agent.add("Context Tester");
   }
 
