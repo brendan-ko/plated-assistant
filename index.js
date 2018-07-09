@@ -52,10 +52,10 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
           'lifespan': 5,
           'parameters': { 'boxes': boxesRes } 
         };
+        console.log(boxesRes);
         agent.setContext(userContext);
         agent.setContext(boxesContext);
         agent.add(`Hi ${userRes.first_name}. What would you like help with today?`);
-        console.log("REQ FINISHED");
         return true;
       })
       .catch(error => {
