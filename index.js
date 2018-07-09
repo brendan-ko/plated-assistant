@@ -50,11 +50,17 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
         const boxesContext = {
           'name': 'boxes',
           'lifespan': 5,
-          'parameters': { 'boxes': boxesRes } 
+          'parameters': { 'boxes': boxesRes.boxes }
+        };
+        const recipesContext = {
+          'name': 'recipes',
+          'lifespan': 5,
+          'parameters': { 'recipes': boxesRes.recipes }
         };
         console.log(boxesRes);
         agent.setContext(userContext);
         agent.setContext(boxesContext);
+        agent.setContext(recipesContext);
         agent.add(`Hi ${userRes.first_name}. What would you like help with today?`);
         return true;
       })
@@ -78,7 +84,11 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 
   function recipeSearch(agent) {
     console.log(agent);
-    agent.add("recipe search");
+    const recipeSearch = require('./recipeSearch');
+    const recipes = agent.getContext('recipes');
+    const { recipeTitleExtract, recipeStringCount, recipeFindBestMatch, recipeErrorMessage } = recipeSearch;
+    console.log(recipes);
+
   }
 
   function recipeShow(agent) {

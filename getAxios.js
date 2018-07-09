@@ -3,7 +3,7 @@ const axios = require('axios');
 function getBoxes(configHeader) {
   return axios.get('https://pltd-staging.com/api/v2/boxes.json', configHeader)
   .then(boxRes => {
-    return boxRes.data.boxes;
+    return boxRes.data;
   })
   .catch(error => {
     console.log("box error");

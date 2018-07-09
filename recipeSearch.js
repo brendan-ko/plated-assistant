@@ -1,8 +1,13 @@
-const recipeErrorMessage = 'Sorry, I couldn\'t find any recipes with that name.';
+const recipeErrorMessage = 'Sorry, I couldn\'t find any recipes with that Title.';
 const sampleRecipes = require('./sampleRecipes');
 
-function boxRecipeIdExtract(recipeData) {
-
+function recipeTitleExtract(boxData) {
+  const {recipes} = boxData;
+  const recipeTitleArr = [];
+  recipes.forEach( (recipe) => {
+    recipeTitleArr.push(recipe.title);
+  })
+  return recipeTitleArr;
 }
 
 function recipeStringCount(ingredients, recipeStr) {
@@ -32,7 +37,7 @@ function recipeFindBestMatch(ingredients, recipeStrArr) {
 }
 
 module.exports = {
-  'boxRecipeIdExtract': boxRecipeIdExtract,
+  'recipeTitleExtract': recipeTitleExtract,
   'recipeStringCount': recipeStringCount,
   'recipeFindBestMatch': recipeFindBestMatch,
   'recipeErrorMessage': recipeErrorMessage,
