@@ -1,5 +1,6 @@
 const assert = require('chai').assert;
 const recipeSearch = require('../recipeSearch');
+
 const {recipeStringCount, recipeFindBestMatch, recipeErrorMessage} = recipeSearch;
 
 describe('recipeSearch', function() {
@@ -52,5 +53,6 @@ describe('recipeSearch', function() {
         ['chicken sandwich', 'pork sliders', 'beef noodles', 'beef wrapped in lettuce']),
         'beef wrapped in lettuce');
     });
+    //need test and design to handle equal matching recipes and which to decide to pick, current setup is choose first one.
   })
 })
