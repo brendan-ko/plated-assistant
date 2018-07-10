@@ -1,38 +1,49 @@
 const recipeErrorMessage = 'Sorry, I couldn\'t find any recipes with that Title.';
 const sampleRecipes = require('./sampleRecipes');
 
-function recipeTitleExtract(boxData) {
-  const {recipes} = boxData;
-  const recipeTitleArr = [];
-  recipes.forEach( (recipe) => {
-    recipeTitleArr.push(recipe.title);
+function recipeTitleExtract(recipeData) {
+  const recipeTitleObj = {};
+  recipeData.forEach( (recipe) => {
+    const {name}= recipe;
+    const lowerTitle = name.toLowerCase();
+    recipeTitleObj[lowerTitle] = recipe;
   })
-  return recipeTitleArr;
+  return recipeTitleObj;
 }
 
-function recipeStringCount(ingredients, recipeStr) {
-  let strCount = 0;
-  ingredients.forEach( (ingredient) => {
-    if (recipeStr.toLowerCase().indexOf(ingredient) !== -1) strCount++;
+function recipeStringCount(lowerQuerySplit, recipeStr) {
+  let count = 0;
+  lowerQuerySplit.forEach( (queryWord) => {
+    if(recipeStr.indexOf(queryWord) !== -1) count++;
   })
-  return strCount;
+  return count;
 }
 
-function recipeFindBestMatch(ingredients, recipeStrArr) {
-  if(ingredients.length === 0 || recipeStrArr.length === 0) {
+function recipeFindBestMatch(lowerQuery, recipeTitleObj) {
+  let bestMatchTitle = null;
+  let bestMatchCount = 0;
+  if(lowerQuery.length === 0 || Object.keys(recipeTitleObj).length === 0) {
     return recipeErrorMessage;
   }
   else {
-    let highestMatchCount = 0;
-    let highestMatchStr = recipeErrorMessage;
-    recipeStrArr.forEach( (recipeStr) => {
-      const strCount = recipeStringCount(ingredients, recipeStr);
-      if (strCount > highestMatchCount) {
-        highestMatchCount = strCount;
-        highestMatchStr = recipeStr;
-      }
-    })
-    return highestMatchStr;
+    if (recipeTitleObj[lowerQuery]) {
+      return recipeTitleObj[lowerQuery];
+    }
+    else {
+      const lowerQuerySplit = lowerQuery.split(' ');
+      console.log(lowerQuerySplit);
+      Object.keys(recipeTitleObj).forEach( (recipeTitle) => {
+        console.log(recipeTitle);
+        const recipeMatchCount = recipeStringCount(lowerQuerySplit, recipeTitle);
+        console.log(recipeMatchCount);
+        console.log(bestMatchCount)
+        if (!bestMatchTitle || recipeMatchCount > bestMatchCount) {
+          bestMatchTitle = recipeTitle;
+          bestMatchCount = recipeMatchCount;
+        }
+      })
+      return recipeTitleObj[bestMatchTitle];
+    }
   }
 }
 

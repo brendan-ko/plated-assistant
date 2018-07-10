@@ -16,8 +16,6 @@ function htmlStrip(str) {
   return str.replace(/<[/?a-z]*>/g, '');
 }
 
-//handleNav function
-
 process.env.DEBUG = 'dialogflow:debug'; // enables lib debugging statements
 
 exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, response) => {
@@ -43,8 +41,8 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 
     return Promise.all([boxes, user])
       .then(([boxesRes, userRes]) => {
-        console.log(userRes);
-        console.log(boxesRes);
+        // console.log(userRes);
+        // console.log(boxesRes);
         const userContext = createContext('user', 20, userRes);
         const boxesContext = createContext('boxes', 20, boxesRes.boxes);
         const recipesContext = createContext('recipes', 20, boxesRes.recipes);
@@ -75,12 +73,20 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
   }
 
   function recipeSearch(agent) {
-    console.log(agent);
+    // console.log(agent);
+    // console.log(agent.contexts);
+    console.log(agent.query);
     const recipeSearch = require('./recipeSearch');
-    const recipes = agent.getContext('recipes');
+    const recipesContext = agent.getContext('recipes');
+    const {recipes} = recipesContext.parameters;
     const { recipeTitleExtract, recipeStringCount, recipeFindBestMatch, recipeErrorMessage } = recipeSearch;
-    console.log(recipes);
-
+    const recipeTitleObj = recipeTitleExtract(recipes);
+    console.log(Object.keys(recipeTitleObj));
+    const {query} = agent;
+    const lowerQuery = query.toLowerCase();
+    const bestMatchRecipe = recipeFindBestMatch(lowerQuery, recipeTitleObj);
+    console.log(bestMatchRecipe);
+    agent.add(`Were you looking for ${bestMatchRecipe.name}?`);
   }
 
   function recipeShow(agent) {
